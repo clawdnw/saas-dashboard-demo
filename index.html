@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       margin: 0;
@@ -352,8 +353,16 @@
     /* Content Grid */
     .content-grid {
       display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .charts-row {
+      display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 24px;
+      margin-bottom: 24px;
     }
     
     /* Card */
@@ -388,61 +397,15 @@
       color: var(--accent-light);
     }
     
-    /* Chart */
+    /* Chart Container */
     .chart-container {
       padding: 20px;
+      height: 280px;
     }
     
-    .chart {
-      height: 240px;
-      display: flex;
-      align-items: flex-end;
-      gap: 12px;
-      padding: 0 20px;
-    }
-    
-    .chart-bar {
-      flex: 1;
-      background: linear-gradient(to top, var(--accent), var(--accent-light));
-      border-radius: 6px 6px 0 0;
-      position: relative;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    
-    .chart-bar:hover {
-      opacity: 0.8;
-    }
-    
-    .chart-bar::after {
-      content: attr(data-value);
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    
-    .chart-bar:hover::after {
-      opacity: 1;
-    }
-    
-    .chart-labels {
-      display: flex;
-      gap: 12px;
-      padding: 12px 20px 0;
-      border-top: 1px solid var(--border-color);
-    }
-    
-    .chart-label {
-      flex: 1;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
     
     /* Table */
@@ -568,7 +531,84 @@
       color: var(--text-muted);
     }
     
+    /* Period Tabs */
+    .period-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    
+    .period-tab {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .period-tab:hover {
+      color: var(--text-secondary);
+    }
+    
+    .period-tab.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    /* Funnel */
+    .funnel-container {
+      padding: 20px;
+    }
+    
+    .funnel-stage {
+      margin-bottom: 16px;
+    }
+    
+    .funnel-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    
+    .funnel-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .funnel-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .funnel-bar {
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .funnel-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    
+    .funnel-fill.visitors { background: var(--info); }
+    .funnel-fill.signups { background: var(--accent); }
+    .funnel-fill.trials { background: var(--warning); }
+    .funnel-fill.conversions { background: var(--success); }
+    
     /* Responsive */
+    @media (max-width: 1400px) {
+      .charts-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
     @media (max-width: 1200px) {
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -621,6 +661,28 @@
     .stat-card:nth-child(4) { animation-delay: 0.25s; }
     
     .card { animation: fadeIn 0.4s ease forwards; animation-delay: 0.3s; opacity: 0; }
+    
+    /* Live indicator */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--success);
+    }
+    
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
   </style>
 </head>
 <body>
@@ -699,6 +761,10 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           <input type="text" placeholder="Search anything...">
         </div>
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          Live
+        </div>
         <button class="btn btn-primary">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           Add New
@@ -718,7 +784,7 @@
             +12.5%
           </div>
         </div>
-        <div class="stat-value">$48,352</div>
+        <div class="stat-value" id="revenue-value">$48,352</div>
         <div class="stat-label">Total Revenue</div>
       </div>
       
@@ -732,7 +798,7 @@
             +8.2%
           </div>
         </div>
-        <div class="stat-value">2,847</div>
+        <div class="stat-value" id="customers-value">2,847</div>
         <div class="stat-label">Total Customers</div>
       </div>
       
@@ -746,7 +812,7 @@
             -3.1%
           </div>
         </div>
-        <div class="stat-value">1,284</div>
+        <div class="stat-value" id="orders-value">1,284</div>
         <div class="stat-label">Total Orders</div>
       </div>
       
@@ -765,77 +831,89 @@
       </div>
     </div>
     
-    <!-- Content Grid -->
-    <div class="content-grid">
+    <!-- Charts Row -->
+    <div class="charts-row">
       <!-- Revenue Chart -->
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Revenue Overview</h3>
-          <span class="card-action">View Report</span>
+          <div class="period-tabs">
+            <span class="period-tab" data-period="week">Week</span>
+            <span class="period-tab active" data-period="month">Month</span>
+            <span class="period-tab" data-period="year">Year</span>
+          </div>
         </div>
         <div class="chart-container">
-          <div class="chart">
-            <div class="chart-bar" style="height: 65%;" data-value="$32K"></div>
-            <div class="chart-bar" style="height: 45%;" data-value="$22K"></div>
-            <div class="chart-bar" style="height: 85%;" data-value="$42K"></div>
-            <div class="chart-bar" style="height: 55%;" data-value="$28K"></div>
-            <div class="chart-bar" style="height: 75%;" data-value="$38K"></div>
-            <div class="chart-bar" style="height: 95%;" data-value="$48K"></div>
-            <div class="chart-bar" style="height: 70%;" data-value="$35K"></div>
-          </div>
-          <div class="chart-labels">
-            <span class="chart-label">Mon</span>
-            <span class="chart-label">Tue</span>
-            <span class="chart-label">Wed</span>
-            <span class="chart-label">Thu</span>
-            <span class="chart-label">Fri</span>
-            <span class="chart-label">Sat</span>
-            <span class="chart-label">Sun</span>
-          </div>
+          <canvas id="revenueChart"></canvas>
         </div>
       </div>
       
-      <!-- Activity Feed -->
+      <!-- User Distribution -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Recent Activity</h3>
-          <span class="card-action">View All</span>
+          <h3 class="card-title">User Distribution</h3>
+          <span class="card-action">View Details</span>
         </div>
-        <div class="activity-list">
-          <div class="activity-item">
-            <div class="activity-icon" style="background: rgba(34, 197, 94, 0.15); color: var(--success);">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="chart-container">
+          <canvas id="distributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Second Charts Row -->
+    <div class="content-grid">
+      <!-- User Growth Chart -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">User Growth Trend</h3>
+          <span class="card-action">Export</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Conversion Funnel -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Conversion Funnel</h3>
+          <span class="card-action">Analyze</span>
+        </div>
+        <div class="funnel-container">
+          <div class="funnel-stage">
+            <div class="funnel-header">
+              <span class="funnel-label">Visitors</span>
+              <span class="funnel-value">45,892</span>
             </div>
-            <div class="activity-content">
-              <div class="activity-text"><strong>New sale</strong> - Premium Plan purchased</div>
-              <div class="activity-time">2 minutes ago</div>
+            <div class="funnel-bar">
+              <div class="funnel-fill visitors" style="width: 100%;"></div>
             </div>
           </div>
-          <div class="activity-item">
-            <div class="activity-icon" style="background: rgba(59, 130, 246, 0.15); color: var(--info);">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          <div class="funnel-stage">
+            <div class="funnel-header">
+              <span class="funnel-label">Sign Ups</span>
+              <span class="funnel-value">8,247</span>
             </div>
-            <div class="activity-content">
-              <div class="activity-text"><strong>New user</strong> - Sarah joined the team</div>
-              <div class="activity-time">15 minutes ago</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            </div>
-            <div class="activity-content">
-              <div class="activity-text"><strong>Low stock</strong> - Product SKU-2847</div>
-              <div class="activity-time">1 hour ago</div>
+            <div class="funnel-bar">
+              <div class="funnel-fill signups" style="width: 72%;"></div>
             </div>
           </div>
-          <div class="activity-item">
-            <div class="activity-icon" style="background: rgba(139, 92, 246, 0.15); color: var(--accent);">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+          <div class="funnel-stage">
+            <div class="funnel-header">
+              <span class="funnel-label">Free Trials</span>
+              <span class="funnel-value">3,842</span>
             </div>
-            <div class="activity-content">
-              <div class="activity-text"><strong>New comment</strong> - on Q4 Report</div>
-              <div class="activity-time">3 hours ago</div>
+            <div class="funnel-bar">
+              <div class="funnel-fill trials" style="width: 47%;"></div>
+            </div>
+          </div>
+          <div class="funnel-stage">
+            <div class="funnel-header">
+              <span class="funnel-label">Conversions</span>
+              <span class="funnel-value">2,847</span>
+            </div>
+            <div class="funnel-bar">
+              <div class="funnel-fill conversions" style="width: 32%;"></div>
             </div>
           </div>
         </div>
@@ -927,15 +1005,252 @@
   </main>
   
   <script>
-    // Animate chart bars on load
-    document.addEventListener('DOMContentLoaded', () => {
-      const bars = document.querySelectorAll('.chart-bar');
-      bars.forEach((bar, i) => {
-        const height = bar.style.height;
-        bar.style.height = '0%';
-        setTimeout(() => {
-          bar.style.height = height;
-        }, 100 + (i * 50));
+    // Chart.js default configuration
+    Chart.defaults.color = '#a3a3a3';
+    Chart.defaults.borderColor = '#262626';
+    Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
+    
+    // Revenue Chart Data
+    const revenueData = {
+      week: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        revenue: [12500, 15200, 18900, 14300, 21800, 19200, 16700],
+        orders: [145, 178, 203, 167, 234, 198, 189]
+      },
+      month: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        revenue: [42500, 48200, 51800, 48352],
+        orders: [512, 587, 623, 584]
+      },
+      year: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        revenue: [125000, 142000, 138000, 156000, 178000, 195000, 212000, 234000, 198000, 245000, 267000, 289000],
+        orders: [1420, 1580, 1530, 1720, 1960, 2150, 2340, 2580, 2180, 2710, 2950, 3190]
+      }
+    };
+    
+    let currentPeriod = 'month';
+    let revenueChart, distributionChart, growthChart;
+    
+    // Revenue Chart
+    function createRevenueChart(period) {
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      const data = revenueData[period];
+      
+      if (revenueChart) {
+        revenueChart.destroy();
+      }
+      
+      revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Revenue',
+            data: data.revenue,
+            backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            borderColor: 'rgba(167, 139, 250, 1)',
+            borderWidth: 2,
+            borderRadius: 6,
+            hoverBackgroundColor: 'rgba(167, 139, 250, 1)',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#fafafa',
+              bodyColor: '#a3a3a3',
+              borderColor: '#262626',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return '$' + context.raw.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(38, 38, 38, 0.5)' },
+              ticks: {
+                callback: function(value) {
+                  return '$' + (value / 1000) + 'K';
+                }
+              }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          animation: {
+            duration: 750,
+            easing: 'easeOutQuart'
+          }
+        }
+      });
+    }
+    
+    // User Distribution Chart (Doughnut)
+    function createDistributionChart() {
+      const ctx = document.getElementById('distributionChart').getContext('2d');
+      
+      distributionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Basic', 'Premium', 'Enterprise', 'Free Trial'],
+          datasets: [{
+            data: [1245, 987, 423, 345],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(139, 92, 246, 0.8)',
+              'rgba(34, 197, 94, 0.8)',
+              'rgba(245, 158, 11, 0.8)'
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(139, 92, 246, 1)',
+              'rgba(34, 197, 94, 1)',
+              'rgba(245, 158, 11, 1)'
+            ],
+            borderWidth: 2,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#fafafa',
+              bodyColor: '#a3a3a3',
+              borderColor: '#262626',
+              borderWidth: 1,
+              padding: 12,
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.raw / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.raw.toLocaleString()} (${percentage}%)`;
+                }
+              }
+            }
+          },
+          cutout: '65%',
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1000
+          }
+        }
+      });
+    }
+    
+    // User Growth Chart (Line)
+    function createGrowthChart() {
+      const ctx = document.getElementById('growthChart').getContext('2d');
+      
+      growthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          datasets: [{
+            label: 'New Users',
+            data: [234, 312, 287, 356, 423, 512, 489, 567, 623, 712, 789, 847],
+            borderColor: 'rgba(139, 92, 246, 1)',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(139, 92, 246, 1)',
+            pointBorderColor: '#0a0a0a',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }, {
+            label: 'Churned',
+            data: [45, 52, 38, 61, 48, 55, 42, 58, 67, 72, 59, 63],
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+            pointBorderColor: '#0a0a0a',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'end',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#1a1a1a',
+              titleColor: '#fafafa',
+              bodyColor: '#a3a3a3',
+              borderColor: '#262626',
+              borderWidth: 1,
+              padding: 12
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(38, 38, 38, 0.5)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+          }
+        }
+      });
+    }
+    
+    // Period tab switching
+    document.querySelectorAll('.period-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const period = this.dataset.period;
+        currentPeriod = period;
+        createRevenueChart(period);
       });
     });
     
@@ -945,6 +1260,36 @@
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         this.classList.add('active');
       });
+    });
+    
+    // Simulate live updates
+    function simulateLiveUpdate() {
+      const revenueEl = document.getElementById('revenue-value');
+      const customersEl = document.getElementById('customers-value');
+      const ordersEl = document.getElementById('orders-value');
+      
+      let revenue = 48352;
+      let customers = 2847;
+      let orders = 1284;
+      
+      setInterval(() => {
+        // Small random changes
+        revenue += Math.floor(Math.random() * 200) - 50;
+        customers += Math.random() > 0.7 ? 1 : 0;
+        orders += Math.random() > 0.5 ? 1 : 0;
+        
+        revenueEl.textContent = '$' + revenue.toLocaleString();
+        customersEl.textContent = customers.toLocaleString();
+        ordersEl.textContent = orders.toLocaleString();
+      }, 5000);
+    }
+    
+    // Initialize charts
+    document.addEventListener('DOMContentLoaded', () => {
+      createRevenueChart('month');
+      createDistributionChart();
+      createGrowthChart();
+      simulateLiveUpdate();
     });
   </script>
 </body>
